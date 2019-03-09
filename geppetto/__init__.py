@@ -1,0 +1,1 @@
+from .geppetto import app  # required to run flask
