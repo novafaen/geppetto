@@ -1,1 +1,3 @@
-from .geppetto import app  # required to run flask
+from .geppetto import app
+
+__all__ = ['app']

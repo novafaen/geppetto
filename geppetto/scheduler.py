@@ -19,7 +19,9 @@ class Scheduler(Thread):
         for event in config['events']:
             for event_day in event['days']:
                 day, time = event_day['day'], event_day['time']
-                self.schedule_event(event['type'], day, time, event['lights'])
+                self.schedule_event(event['type'], day, time,
+                                    lights=event['lights'],
+                                    switches=event['switches'])
 
         for schedule_day in config['schedule']:
             start, end = schedule_day['start'], schedule_day['end']
@@ -38,9 +40,11 @@ class Scheduler(Thread):
 
         schedule.every(1).minute.do(schedule_function, start, end, lights)
 
-    def schedule_event(self, event_name, day, time, lights):
+    def schedule_event(self, event_name, day, time, lights=None, switches=None):
         if event_name == 'power_on':
             event_function = self._event_power_on
+        elif event_name == 'power_off':
+            event_function = self._event_power_off
         elif event_name == 'wakeup':
             event_function = self._event_wakeup
         else:
@@ -55,6 +59,7 @@ class Scheduler(Thread):
             schedule.every().wednesday.at(time).do(event_function, lights)
         elif day == 'thursday':
             schedule.every().thursday.at(time).do(event_function, lights)
+            schedule.every().thursday.at(time).do(event_function, switches)
         elif day == 'friday':
             schedule.every().friday.at(time).do(event_function, lights)
         elif day == 'saturday':
@@ -72,13 +77,13 @@ class Scheduler(Thread):
         if start < end and start <= now <= end \
                 or start > end and now > start > end \
                 or start > end and now < end < start:
-            logging.debug('[scheduler] event bright on for %s', lights)
+            logging.debug('[scheduler] scheduled bright on for %s', lights)
             try:
                 self.schedule_bright(lights)
             except Exception as err:
                 logging.error('[scheduler] Unexpected bright schedule crash: %s', err)
         else:
-            logging.debug('[scheduler] event bright outside time %s', now)
+            logging.debug('[scheduler] scheduled bright outside time %s', now)
 
     @staticmethod
     def schedule_bright(lights):
@@ -89,27 +94,37 @@ class Scheduler(Thread):
         if start < end and start <= now <= end \
                 or start > end and now > start > end \
                 or start > end and now < end < start:
-            logging.debug('[scheduler] event sunlight on for %s', lights)
+            logging.debug('[scheduler] scheduled sunlight on for %s', lights)
             try:
                 self.schedule_sunlight(lights)
             except Exception as err:
                 logging.error('[scheduler] Unexpected sunlight schedule crash: %s', err)
         else:
-            logging.debug('[scheduler] event sunlight outside time %s', now)
+            logging.debug('[scheduler] scheduled sunlight outside time %s', now)
 
     @staticmethod
     def schedule_sunlight(lights):
         raise NotImplementedError('missing implementation schedule function: sunlight')
 
-    def _event_power_on(self, lights):
-        logging.debug('[scheduler] event power on for %s', lights)
+    def _event_power_on(self, devices):
+        logging.debug('[scheduler] event power on for %s', devices)
         try:
-            self.event_power_on(lights)
+            self.event_power_on(devices)
         except Exception as err:
             logging.error('[scheduler] Unexpected power_on event crash: %s', err)
 
-    def event_power_on(self, lights):
+    def event_power_on(self, devices):
         raise NotImplementedError('missing implementation event function: power_on')
+
+    def _event_power_off(self, devices):
+        logging.debug('[scheduler] event power off for %s', devices)
+        try:
+            self.event_power_off(devices)
+        except Exception as err:
+            logging.error('[scheduler] Unexpected power_on event crash: %s', err)
+
+    def event_power_off(self, devices):
+        raise NotImplementedError('missing implementation event function: power_off')
 
     def _event_wakeup(self, lights):
         logging.debug('[scheduler] event wake up for %s', lights)
@@ -121,20 +136,3 @@ class Scheduler(Thread):
 
     def event_wakeup(self, lights):
         raise NotImplementedError('missing implementation event function: wakeup')
-
-
-if __name__ == '__main__':
-    logging.basicConfig(
-        format='%(asctime)s [%(levelname)s] %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        level=logging.DEBUG
-    )
-
-    import json
-    fh = open('../configuration.json', 'rb')
-    config = json.loads(fh.read())
-    fh.close()
-
-    removeme = Scheduler(config)
-
-    removeme.start()

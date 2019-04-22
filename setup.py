@@ -12,7 +12,10 @@ setup(
     packages=['geppetto'],
     requires=[
         'smrt',
-        'schedule'
+        'schedule',
+        'requests',
+        'pysolar',
+        'pytz'
     ],
     dependency_links=[
         'git+https://github.com/novafaen/smrt.git'
