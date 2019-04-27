@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "address": {
+      "type": "object",
+      "properties": {
+        "ip": { "type": "string" },
+        "port": { "type": "string" }
+      },
+      "required": ["port"]
+    }
+  },
+  "required": ["name"]
+}

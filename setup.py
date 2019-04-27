@@ -10,7 +10,7 @@ setup(
     author_email='smrt@novafaen.se',
     url='http://smrt.novafaen.se/',
     packages=['geppetto'],
-    requires=[
+    install_requires=[
         'smrt',
         'schedule',
         'requests',
@@ -18,7 +18,7 @@ setup(
         'pytz'
     ],
     dependency_links=[
-        'git+https://github.com/novafaen/smrt.git'
+        'git+https://github.com/novafaen/smrt.git#egg=smrt'
     ],
     test_suite='tests',
     tests_require=[

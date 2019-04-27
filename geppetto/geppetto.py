@@ -1,26 +1,33 @@
+"""Geppetto is a scheduler and event service built on SMRT framework.
+
+The scheduler uses adapters to talk to other micro services.
+"""
+
 import datetime
-import json
 import logging
 
 from pysolar.solar import get_altitude
 
-from smrt import SMRTApp, app, make_response
+from smrt import SMRTApp, app
 
 from geppetto.adapters.lights import LightAdapter
 from geppetto.adapters.switch import SwitchAdapter
 from geppetto.scheduler import Scheduler
 
+log = logging.getLogger('geppetto')
+
 
 class Geppetto(SMRTApp):
+    """Geppetto is a ``SMRTApp`` that is to be registered with SMRT."""
+
     def __init__(self):
-        logging.debug('Geppetto spinning up...')
+        """Create and initiate ````Geppetto`` application."""
+        log.debug('%s (%s) spinning up...', self.application_name(), self.version())
 
         SMRTApp.__init__(self)
 
         self.light_adapter = LightAdapter(self.config['smrt']['light'])
         self.switch_adapter = SwitchAdapter(self.config['smrt']['switch'])
-
-        self.listen(self.recv_broadcast)
 
         self.scheduler = Scheduler(self.config)
         self.scheduler.event_power_on = self.action_power_on
@@ -30,37 +37,50 @@ class Geppetto(SMRTApp):
 
         self.scheduler.run()
 
-        logging.debug('Geppetto initiated!')
+        log.debug('%s initiated!', self.application_name())
 
     def status(self):
+        """See ``SMRTApp`` documentation."""
         return {
-            'name': 'Geppetto',
+            'name': self.application_name(),
             'status': 'OK',
-            'version': '0.0.1'
+            'version': self.version()
         }
 
     @staticmethod
-    def client_name():
+    def version():
+        """See ``SMRTApp`` documentation."""
+        return '0.0.1'
+
+    @staticmethod
+    def application_name():
+        """See ``SMRTApp`` documentation."""
         return 'Geppetto'
 
-    def recv_broadcast(self, data):
-        data = json.loads(data)
-
     def action_power_on(self, devices):
+        """Take action, power on devices identified by name.
+
+        :param devices: ``[String]`` device names
+        """
         self._power(devices, True)
 
     def action_power_off(self, devices):
+        """Take action; power off devices identified by name.
+
+        :param devices: ``[String]`` device names
+        """
         self._power(devices, False)
 
     def _power(self, devices, on_off):
-        logging.debug('[geppetto] event power_on for %s', devices)
+        """Action, internal function to toggle power."""
+        log.debug('event power_on for %s', devices)
         for device in devices:
             if device in self.config['lights']:
                 adapter = self.light_adapter
             elif device in self.config['switches']:
                 adapter = self.switch_adapter
             else:
-                logging.error('[geppetto] failed, %s is not configured')
+                log.error('failed, %s is not configured')
                 return  # graceful error
 
             if on_off:
@@ -69,16 +89,24 @@ class Geppetto(SMRTApp):
                 adapter.power_off(device)
 
     def action_bright(self, lights):
-        logging.debug('[geppetto] event bright for bulbs: %', lights)
+        """Take action; set light sources to bright.
+
+        :param lights: ``[String]`` light names
+        """
+        log.debug('event bright for lights: %', lights)
 
         # kelvin range: sun 1850-6500
         # lifx 2500-9000
         # yeelight ?-?
         for light in lights:
-            self.light_adapter.set_state(light, brightness=1.0, kelvin=2500)
+            self.light_adapter.set_state(light, brightness=1.0, kelvin=2500, duration=60)
 
     def action_sunlight(self, lights):
-        logging.debug('[geppetto] event sunlight for bulbs: %s', lights)
+        """Take action; set light source to match sun.
+
+        :param lights: ``[String]`` light names
+        """
+        log.debug('event sunlight for lights: %s', lights)
 
         now_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         midday_utc = datetime.datetime.now(tz=datetime.timezone.utc)\
@@ -97,18 +125,20 @@ class Geppetto(SMRTApp):
 
         kelvin = 2500 + int(2000 * (sun_angle / sun_angle_max))
 
-        # brightness range, 0.5-1.0, cast to 2 decimals
-        brightness = 0.5 + 0.5 * (sun_angle / sun_angle_max)
-        brightness = float('{0:.2f}'.format(brightness))
+        # brightness range, 50-100, cast to 2 decimals
+        brightness = int(50 + 50 * (sun_angle / sun_angle_max))
+
+        log.debug('max=%s, current=%s, brightness=%s', sun_angle_max, sun_angle, brightness)
 
         # handle if sun is not at top at noon
         if kelvin > 6500:
             kelvin = 6500
-        if brightness > 1.0:
-            brightness = 1.0
+        if brightness > 100:
+            brightness = 100
 
-        logging.debug('[geppetto] sun angle %s', sun_angle)
+        for light in lights:
+            self.light_adapter.set_state(light, brightness=brightness, kelvin=kelvin, duration=45)
 
 
 geppetto = Geppetto()
-app.register_client(geppetto)
+app.register_application(geppetto)

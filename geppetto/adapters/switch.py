@@ -1,16 +1,30 @@
+"""Adapter to abstract REST to functions for switches."""
+
 import logging
 import requests
 
+log = logging.getLogger('geppetto')
+
 
 class SwitchAdapter:
+    """Switch adapter class."""
 
     def __init__(self, base_url):
+        """Create and initiate SwitchAdapter."""
         self._url = base_url
 
-    def power_on(self, device):
-        self._power(device, True)
+    def power_on(self, name):
+        """Turn on switch based on name.
+
+        :param name: ``String`` name
+        """
+        self._power(name, True)
 
     def power_off(self, device):
+        """Turn off switch based on name.
+
+        :param name: ``String`` name
+        """
         self._power(device, False)
 
     def _power(self, device, on_off):
@@ -21,9 +35,8 @@ class SwitchAdapter:
             power = 'on'
 
         response = requests.put(
-            self._url + '/device/%s/power/%s' % (device, power),
+            self._url + 'device/%s/power/%s' % (device, power),
             headers={'Accept': 'application/se.novafaen.stick.device.v1+json'}
         )
 
-        logging.debug(response.status_code)
-        logging.debug(response.text)
+        log.debug('set device state successful=%s', response.status_code == 200)
