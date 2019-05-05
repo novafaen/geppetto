@@ -27,7 +27,7 @@ class Geppetto(SMRTApp):
 
         self._schemas_path = os.path.join(os.path.dirname(__file__), 'schemas')
 
-        SMRTApp.__init__(self, self._schemas_path, 'configuration.schema.geppetto.json')
+        SMRTApp.__init__(self, self._schemas_path, 'configuration.geppetto.schema.json')
 
         self.light_adapter = LightAdapter(self._config['smrt']['light'])
         self.switch_adapter = SwitchAdapter(self._config['smrt']['switch'])
@@ -38,7 +38,7 @@ class Geppetto(SMRTApp):
         self.scheduler.schedule_bright = self.action_bright
         self.scheduler.schedule_sunlight = self.action_sunlight
 
-        self.scheduler.run()
+        self.scheduler.start()
 
         log.debug('%s initiated!', self.application_name())
 
