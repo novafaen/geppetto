@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "smrt": {
+      "type": "object",
+      "properties": {
+        "light": {
+          "type": "string"
+        },
+        "switch": {
+          "type": "string"
+        }
+      },
+      "required": [],
+      "additionalProperties": true
+    },
+    "location": {
+      "type": "object",
+      "properties": {
+        "cityname": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "number"
+        },
+        "latitude": {
+          "type": "number"
+        }
+      },
+      "required": ["longitude", "latitude"]
+    },
+    "lights": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "switches": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "schedule": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string",
+            "pattern": "^[0-9]{2}:[0-9]{2}$"
+          },
+          "end": {
+            "type": "string",
+            "pattern": "^[0-9]{2}:[0-9]{2}$"
+          },
+          "lights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["type", "start", "end", "lights"],
+        "additionalProperties": false
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "day": {
+                  "type": "string",
+                  "enum": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+                },
+                "time": {
+                  "type": "string",
+                  "pattern": "^[0-9]{2}:[0-9]{2}$"
+                }
+              },
+              "required": ["day", "time"],
+              "additionalProperties": false
+            }
+          },
+          "lights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "switches": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["type", "days", "lights", "switches"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["smrt", "location", "lights", "switches"],
+  "additionalProperties": false
+}

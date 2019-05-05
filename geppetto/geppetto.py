@@ -4,7 +4,8 @@ The scheduler uses adapters to talk to other micro services.
 """
 
 import datetime
-import logging
+import logging as loggr
+import os
 
 from pysolar.solar import get_altitude
 
@@ -14,7 +15,7 @@ from geppetto.adapters.lights import LightAdapter
 from geppetto.adapters.switch import SwitchAdapter
 from geppetto.scheduler import Scheduler
 
-log = logging.getLogger('geppetto')
+log = loggr.getLogger('geppetto')
 
 
 class Geppetto(SMRTApp):
@@ -24,12 +25,14 @@ class Geppetto(SMRTApp):
         """Create and initiate ````Geppetto`` application."""
         log.debug('%s (%s) spinning up...', self.application_name(), self.version())
 
-        SMRTApp.__init__(self)
+        self._schemas_path = os.path.join(os.path.dirname(__file__), 'schemas')
 
-        self.light_adapter = LightAdapter(self.config['smrt']['light'])
-        self.switch_adapter = SwitchAdapter(self.config['smrt']['switch'])
+        SMRTApp.__init__(self, self._schemas_path, 'configuration.schema.geppetto.json')
 
-        self.scheduler = Scheduler(self.config)
+        self.light_adapter = LightAdapter(self._config['smrt']['light'])
+        self.switch_adapter = SwitchAdapter(self._config['smrt']['switch'])
+
+        self.scheduler = Scheduler(self._config)
         self.scheduler.event_power_on = self.action_power_on
         self.scheduler.event_power_off = self.action_power_off
         self.scheduler.schedule_bright = self.action_bright
@@ -75,9 +78,9 @@ class Geppetto(SMRTApp):
         """Action, internal function to toggle power."""
         log.debug('event power_on for %s', devices)
         for device in devices:
-            if device in self.config['lights']:
+            if device in self._config['lights']:
                 adapter = self.light_adapter
-            elif device in self.config['switches']:
+            elif device in self._config['switches']:
                 adapter = self.switch_adapter
             else:
                 log.error('failed, %s is not configured')
@@ -93,7 +96,7 @@ class Geppetto(SMRTApp):
 
         :param lights: ``[String]`` light names
         """
-        log.debug('event bright for lights: %', lights)
+        log.debug('event bright for lights: %s', lights)
 
         # kelvin range: sun 1850-6500
         # lifx 2500-9000
@@ -111,8 +114,8 @@ class Geppetto(SMRTApp):
         now_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         midday_utc = datetime.datetime.now(tz=datetime.timezone.utc)\
             .replace(hour=12, minute=0)
-        longitude = self.config['location']['longitude']
-        latitude = self.config['location']['latitude']
+        longitude = self._config['location']['longitude']
+        latitude = self._config['location']['latitude']
 
         sun_angle = get_altitude(longitude, latitude, now_utc)
         sun_angle_max = get_altitude(longitude, latitude, midday_utc)
