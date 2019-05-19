@@ -1,9 +1,10 @@
 """Adapter to abstract REST to functions for lights."""
 
-import logging
-import requests
+import logging as loggr
 
-log = logging.getLogger('geppetto')
+from smrt.make_request import put
+
+log = loggr.getLogger('geppetto')
 
 
 class LightAdapter:
@@ -28,7 +29,7 @@ class LightAdapter:
         self._power(light, True)
 
     def _power(self, light, on_off):
-        response = requests.put(
+        response = put(
             self._url + 'light/' + light + '/state/power/' + 'on' if on_off else 'off',
             headers={'Accept': 'application/se.novafaen.prism.light.v1+json'}
         )
@@ -53,13 +54,13 @@ class LightAdapter:
         if duration is not None:
             body['duration'] = duration
 
-        response = requests.put(
+        response = put(
             self._url + 'light/' + light + '/state',
             headers={
                 'Content-Type': 'application/se.novafaen.prism.lightstate.v1+json',
                 'Accept': 'application/se.novafaen.prism.light.v1+json'
             },
-            json=body
+            body=body
         )
 
         log.debug('set light state successful=%s', response.status_code == 200)

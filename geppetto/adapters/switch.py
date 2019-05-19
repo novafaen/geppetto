@@ -1,7 +1,8 @@
 """Adapter to abstract REST to functions for switches."""
 
 import logging
-import requests
+
+from smrt.make_request import put
 
 log = logging.getLogger('geppetto')
 
@@ -34,7 +35,7 @@ class SwitchAdapter:
         if on_off:
             power = 'on'
 
-        response = requests.put(
+        response = put(
             self._url + 'device/%s/power/%s' % (device, power),
             headers={'Accept': 'application/se.novafaen.stick.device.v1+json'}
         )

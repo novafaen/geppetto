@@ -102,7 +102,7 @@ class Geppetto(SMRTApp):
         # lifx 2500-9000
         # yeelight ?-?
         for light in lights:
-            self.light_adapter.set_state(light, brightness=1.0, kelvin=2500, duration=60)
+            self.light_adapter.set_state(light, brightness=100, kelvin=2500, duration=60)
 
     def action_sunlight(self, lights):
         """Take action; set light source to match sun.
