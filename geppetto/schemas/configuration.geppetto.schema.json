@@ -111,8 +111,36 @@
         "required": ["type", "days", "lights", "switches"],
         "additionalProperties": false
       }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "lights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "switches": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["name", "type", "lights", "switches"],
+        "additionalProperties": false
+      }
     }
   },
-  "required": ["smrt", "location", "lights", "switches"],
+  "required": ["smrt", "location", "lights", "switches", "schedule", "events", "actions"],
   "additionalProperties": false
 }

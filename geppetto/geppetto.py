@@ -9,7 +9,8 @@ import os
 
 from pysolar.solar import get_altitude
 
-from smrt import SMRTApp, app
+from smrt import SMRTApp, app, smrt, make_response
+from smrt import ResouceNotFound
 
 from geppetto.adapters.lights import LightAdapter
 from geppetto.adapters.switch import SwitchAdapter
@@ -142,6 +143,40 @@ class Geppetto(SMRTApp):
         for light in lights:
             self.light_adapter.set_state(light, brightness=brightness, kelvin=kelvin, duration=45)
 
+    def action(self, name):
+        """Action; run configured action.
+
+        If action is not configured, raise ``ResouceNotFound`` error.
+
+        :param lights: ``String`` configured action.
+        """
+        action = None
+        for config_action in self._config['actions']:
+            if name == config_action['name']:
+                action = config_action
+                break
+
+        if action is None:
+            raise ResouceNotFound('Action \'{}\' is not configured.'.format(name))
+
+        if action['type'] == 'toggle':
+            for light in config_action['lights']:
+                self.light_adapter.toggle_power(light)
+            for switch in config_action['switches']:
+                self.switch_adapter.toggle_power(switch)
+
 
 geppetto = Geppetto()
 app.register_application(geppetto)
+
+
+@smrt('/action/<string:name>',
+      methods=['POST'])
+def action(name):
+    """Endpoint to perform an action.
+
+    :returns: ``202 Accepted``
+    """
+    geppetto.action(name)
+
+    return make_response('', 202)

@@ -14,6 +14,18 @@ class LightAdapter:
         """Create and initiate LightAdapter."""
         self._url = base_url
 
+    def toggle_power(self, light):
+        """Toggle power based on name.
+
+        :param light: ``String`` name
+        """
+        response = put(
+            self._url + 'light/' + light + '/state/power/toggle',
+            headers={'Accept': 'application/se.novafaen.prism.light.v1+json'}
+        )
+
+        log.debug('toggle light power successful=%s', response.status_code == 200)
+
     def power_on(self, light):
         """Turn on light based on name.
 

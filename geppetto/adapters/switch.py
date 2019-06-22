@@ -14,6 +14,18 @@ class SwitchAdapter:
         """Create and initiate SwitchAdapter."""
         self._url = base_url
 
+    def toggle_power(self, light):
+        """Toggle power based on name.
+
+        :param light: ``String`` name
+        """
+        response = put(
+            self._url + 'device/' + light + '/power/toggle',
+            headers={'Accept': 'application/se.novafaen.stick.device.v1+json'}
+        )
+
+        log.debug('toggle light power successful=%s', response.status_code == 200)
+
     def power_on(self, name):
         """Turn on switch based on name.
 
