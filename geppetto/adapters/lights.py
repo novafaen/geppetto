@@ -38,7 +38,7 @@ class LightAdapter:
 
         :param light: ``String`` name
         """
-        self._power(light, True)
+        self._power(light, False)
 
     def _power(self, light, on_off):
         response = put(
