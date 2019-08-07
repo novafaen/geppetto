@@ -164,6 +164,16 @@ class Geppetto(SMRTApp):
                 self.light_adapter.toggle_power(light)
             for switch in config_action['switches']:
                 self.switch_adapter.toggle_power(switch)
+        elif action['type'] == 'power_on':
+            for light in config_action['lights']:
+                self.light_adapter.power_on(light)
+            for switch in config_action['switches']:
+                self.switch_adapter.power_on(switch)
+        elif action['type'] == 'power_off':
+            for light in config_action['lights']:
+                self.light_adapter.power_off(light)
+            for switch in config_action['switches']:
+                self.switch_adapter.power_off(switch)
 
 
 geppetto = Geppetto()
