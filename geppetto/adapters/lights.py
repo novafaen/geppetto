@@ -42,7 +42,7 @@ class LightAdapter:
 
     def _power(self, light, on_off):
         response = put(
-            self._url + 'light/' + light + '/state/power/' + 'on' if on_off else 'off',
+            self._url + 'light/' + light + '/state/power/' + ('on' if on_off else 'off'),
             headers={'Accept': 'application/se.novafaen.prism.light.v1+json'}
         )
 
