@@ -160,20 +160,19 @@ class Geppetto(SMRTApp):
             raise ResouceNotFound('Action \'{}\' is not configured.'.format(name))
 
         if action['type'] == 'toggle':
-            for light in config_action['lights']:
-                self.light_adapter.toggle_power(light)
-            for switch in config_action['switches']:
-                self.switch_adapter.toggle_power(switch)
+            light_action_function = self.light_adapter.toggle_power
+            switch_action_function = self.switch_adapter.toggle_power
         elif action['type'] == 'power_on':
-            for light in config_action['lights']:
-                self.light_adapter.power_on(light)
-            for switch in config_action['switches']:
-                self.switch_adapter.power_on(switch)
+            light_action_function = self.light_adapter.power_on
+            switch_action_function = self.switch_adapter.power_on
         elif action['type'] == 'power_off':
-            for light in config_action['lights']:
-                self.light_adapter.power_off(light)
-            for switch in config_action['switches']:
-                self.switch_adapter.power_off(switch)
+            light_action_function = self.light_adapter.power_off
+            switch_action_function = self.switch_adapter.power_off
+
+        for light in action['lights']:
+            light_action_function(light)
+        for switch in action['switches']:
+            switch_action_function(switch)
 
 
 geppetto = Geppetto()
