@@ -14,13 +14,13 @@ class SwitchAdapter:
         """Create and initiate SwitchAdapter."""
         self._url = base_url
 
-    def toggle_power(self, light):
+    def toggle_power(self, name):
         """Toggle power based on name.
 
         :param light: ``String`` name
         """
         response = put(
-            self._url + 'device/' + light + '/power/toggle',
+            self._url + 'device/' + name + '/power/toggle',
             headers={'Accept': 'application/se.novafaen.stick.device.v1+json'}
         )
 
