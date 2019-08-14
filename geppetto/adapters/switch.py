@@ -24,7 +24,7 @@ class SwitchAdapter:
             headers={'Accept': 'application/se.novafaen.stick.device.v1+json'}
         )
 
-        log.debug('toggle light power successful=%s', response.status_code == 200)
+        log.debug('set state, device=%s, power=toggle, successful=%s', name, response.status_code == 200)
 
     def power_on(self, name):
         """Turn on switch based on name.
@@ -33,23 +33,21 @@ class SwitchAdapter:
         """
         self._power(name, True)
 
-    def power_off(self, device):
+    def power_off(self, name):
         """Turn off switch based on name.
 
         :param name: ``String`` name
         """
-        self._power(device, False)
+        self._power(name, False)
 
-    def _power(self, device, on_off):
-        logging.debug('[switch] calling %s, power=%s', device, on_off)
-
+    def _power(self, name, on_off):
         power = 'off'
         if on_off:
             power = 'on'
 
         response = put(
-            self._url + 'device/%s/power/%s' % (device, power),
+            self._url + 'device/%s/power/%s' % (name, power),
             headers={'Accept': 'application/se.novafaen.stick.device.v1+json'}
         )
 
-        log.debug('set device state successful=%s', response.status_code == 200)
+        log.debug('set state, device=%s, power=%s, successful=%s', name, on_off, response.status_code == 200)

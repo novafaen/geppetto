@@ -14,50 +14,48 @@ class LightAdapter:
         """Create and initiate LightAdapter."""
         self._url = base_url
 
-    def toggle_power(self, light):
+    def toggle_power(self, name):
         """Toggle power based on name.
 
-        :param light: ``String`` name
+        :param name: ``String`` name
         """
         response = put(
-            self._url + 'light/' + light + '/state/power/toggle',
+            self._url + 'light/' + name + '/state/power/toggle',
             headers={'Accept': 'application/se.novafaen.prism.light.v1+json'}
         )
 
-        log.debug('toggle light power successful=%s', response.status_code == 200)
+        log.debug('set state, light=%s, power=toggle, successful=%s', name, response.status_code == 200)
 
-    def power_on(self, light):
+    def power_on(self, name):
         """Turn on light based on name.
 
-        :param light: ``String`` name
+        :param name: ``String`` name
         """
-        self._power(light, True)
+        self._power(name, True)
 
-    def power_off(self, light):
+    def power_off(self, name):
         """Turn off light based on name.
 
-        :param light: ``String`` name
+        :param name: ``String`` name
         """
-        self._power(light, False)
+        self._power(name, False)
 
-    def _power(self, light, on_off):
+    def _power(self, name, on_off):
         response = put(
-            self._url + 'light/' + light + '/state/power/' + ('on' if on_off else 'off'),
+            self._url + 'light/' + name + '/state/power/' + ('on' if on_off else 'off'),
             headers={'Accept': 'application/se.novafaen.prism.light.v1+json'}
         )
 
-        log.debug('set light state successful=%s', response.status_code == 200)
+        log.debug('set state, light=%s, power=%s, successful=%s', name, on_off, response.status_code == 200)
 
-    def set_state(self, light, brightness=None, kelvin=None, duration=None):
+    def set_state(self, name, brightness=None, kelvin=None, duration=None):
         """Set state for light.
 
-        :param light: ``String`` name
+        :param name: ``String`` name
         :param brightness: ``Integer``, default not included
         :param kelvin: ``Integer``, default not included
         :param duration: ``Integer``, default not included
         """
-        log.debug('[light] trying change state on %s', light)
-
         body = {}
         if brightness is not None:
             body['brightness'] = brightness
@@ -67,7 +65,7 @@ class LightAdapter:
             body['duration'] = duration
 
         response = put(
-            self._url + 'light/' + light + '/state',
+            self._url + 'light/' + name + '/state',
             headers={
                 'Content-Type': 'application/se.novafaen.prism.lightstate.v1+json',
                 'Accept': 'application/se.novafaen.prism.light.v1+json'
@@ -75,4 +73,4 @@ class LightAdapter:
             body=body
         )
 
-        log.debug('set light state successful=%s', response.status_code == 200)
+        log.debug('set state, light=%s, state=%s, successful=%s', name, body, response.status_code == 200)
