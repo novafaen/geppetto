@@ -55,6 +55,7 @@ class Scheduler(Thread):
             log.warning('unknown schedule %s, for %s-%s with %s', schedule_name, start, end, lights)
             return
 
+        log.debug('registered schedule %s, %s-%s', schedule_name, start, end)
         schedule.every(1).minute.do(schedule_function, start, end, lights)
 
     def schedule_event(self, event_name, day, time, lights=None, switches=None):
@@ -91,6 +92,8 @@ class Scheduler(Thread):
         elif day == 'sunday':
             schedule.every().sunday.at(time).do(event_function, lights + switches)
 
+        log.debug('registered event %s, %s at %s', event_name, day, time)
+
     def run(self):
         """Start the thread."""
         while True:
@@ -111,7 +114,7 @@ class Scheduler(Thread):
 
     @staticmethod
     def schedule_bright(lights):
-        """Callback function, must be overridden."""
+        """Abstract callback function, must be overridden."""
         raise NotImplementedError('missing implementation schedule function: bright')
 
     def _schedule_sunlight(self, start, end, lights):
@@ -128,7 +131,7 @@ class Scheduler(Thread):
 
     @staticmethod
     def schedule_sunlight(lights):
-        """Callback function, must be overridden."""
+        """Abstract callback function, must be overridden."""
         raise NotImplementedError('missing implementation schedule function: sunlight')
 
     def _event_power_on(self, devices):
@@ -139,6 +142,7 @@ class Scheduler(Thread):
             log.error('Unexpected power_on event crash: %s', err)
 
     def event_power_on(self, devices):
+        """Abstract callback function, must be overridden."""
         raise NotImplementedError('missing implementation event function: power_on')
 
     def _event_power_off(self, devices):
@@ -150,6 +154,7 @@ class Scheduler(Thread):
             log.error('Unexpected power_on event crash: %s', err)
 
     def event_power_off(self, devices):
+        """Abstract callback function, must be overridden."""
         raise NotImplementedError('missing implementation event function: power_off')
 
     def _event_wakeup(self, lights):
