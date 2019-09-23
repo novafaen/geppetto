@@ -4,7 +4,7 @@ import logging as loggr
 
 from smrt.make_request import put
 
-log = loggr.getLogger('geppetto')
+log = loggr.getLogger('smrt')
 
 
 class LightAdapter:

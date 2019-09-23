@@ -14,7 +14,7 @@ import schedule
 # supress logging from third party library
 logging.getLogger('schedule').setLevel(logging.WARNING)
 
-log = logging.getLogger('geppetto')
+log = logging.getLogger('smrt')
 
 
 class Scheduler(Thread):
@@ -167,4 +167,5 @@ class Scheduler(Thread):
             log.error('Unexpected wakeup event crash: %s', err)
 
     def event_wakeup(self, lights):
+        """Abstract callback function, must be overridden."""
         raise NotImplementedError('missing implementation event function: wakeup')

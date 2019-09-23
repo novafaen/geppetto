@@ -16,7 +16,7 @@ from geppetto.adapters.lights import LightAdapter
 from geppetto.adapters.switch import SwitchAdapter
 from geppetto.scheduler import Scheduler
 
-log = loggr.getLogger('geppetto')
+log = loggr.getLogger('smrt')
 
 
 class Geppetto(SMRTApp):

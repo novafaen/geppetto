@@ -4,7 +4,7 @@ import logging
 
 from smrt.make_request import put
 
-log = logging.getLogger('geppetto')
+log = logging.getLogger('smrt')
 
 
 class SwitchAdapter:
