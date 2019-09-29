@@ -110,7 +110,7 @@ class Scheduler(Thread):
             try:
                 self.schedule_bright(lights)
             except Exception as err:
-                log.error('Unexpected bright schedule crash: %s', err)
+                log.error('Unexpected bright schedule crash: %s', err, exc_info=True)
 
     @staticmethod
     def schedule_bright(lights):
@@ -127,7 +127,7 @@ class Scheduler(Thread):
             try:
                 self.schedule_sunlight(lights)
             except Exception as err:
-                log.error('Unexpected sunlight schedule crash: %s', err)
+                log.error('Unexpected sunlight schedule crash: %s', err, exc_info=True)
 
     @staticmethod
     def schedule_sunlight(lights):
@@ -139,7 +139,7 @@ class Scheduler(Thread):
         try:
             self.event_power_on(devices)
         except Exception as err:
-            log.error('Unexpected power_on event crash: %s', err)
+            log.error('Unexpected power_on event crash: %s', err, exc_info=True)
 
     def event_power_on(self, devices):
         """Abstract callback function, must be overridden."""
@@ -151,7 +151,7 @@ class Scheduler(Thread):
         try:
             self.event_power_off(devices)
         except Exception as err:
-            log.error('Unexpected power_on event crash: %s', err)
+            log.error('Unexpected power_on event crash: %s', err, exc_info=True)
 
     def event_power_off(self, devices):
         """Abstract callback function, must be overridden."""
