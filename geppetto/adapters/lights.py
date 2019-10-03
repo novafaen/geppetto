@@ -48,7 +48,7 @@ class LightAdapter:
 
         log.debug('set state, light=%s, power=%s, successful=%s', name, on_off, response.status_code == 200)
 
-    def set_state(self, name, brightness=None, kelvin=None, duration=None):
+    def set_state(self, name, color=None, brightness=None, kelvin=None, duration=None):
         """Set state for light.
 
         :param name: ``String`` name
@@ -63,6 +63,8 @@ class LightAdapter:
             body['kelvin'] = kelvin
         if duration is not None:
             body['duration'] = duration
+        if color is not None:
+            body['color'] = color
 
         response = put(
             self._url + 'light/' + name + '/state',
