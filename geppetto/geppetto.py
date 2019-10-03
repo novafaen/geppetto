@@ -141,7 +141,10 @@ class Geppetto(SMRTApp):
             brightness = 100
 
         for light in lights:
-            self.light_adapter.set_state(light, color=[255, 255, 255], brightness=brightness, kelvin=kelvin, duration=45)
+            try:
+                self.light_adapter.set_state(light, color=[255, 255, 255], brightness=brightness, kelvin=kelvin, duration=45)
+            except Exception as err:
+                log.warning('failed to set sunling color for %s: %s', light, err)
 
     def action(self, name):
         """Action; run configured action.
