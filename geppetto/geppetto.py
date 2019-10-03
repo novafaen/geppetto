@@ -141,7 +141,7 @@ class Geppetto(SMRTApp):
             brightness = 100
 
         for light in lights:
-            self.light_adapter.set_state(light, brightness=brightness, kelvin=kelvin, duration=45)
+            self.light_adapter.set_state(light, color=[255, 255, 255], brightness=brightness, kelvin=kelvin, duration=45)
 
     def action(self, name):
         """Action; run configured action.
