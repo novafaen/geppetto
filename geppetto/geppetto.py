@@ -103,7 +103,7 @@ class Geppetto(SMRTApp):
         # lifx 2500-9000
         # yeelight ?-?
         for light in lights:
-            self.light_adapter.set_state(light, brightness=100, kelvin=2500, duration=60)
+            self.light_adapter.set_state(light, color=[255, 255, 255], brightness=100, kelvin=3500, duration=45)
 
     def action_sunlight(self, lights):
         """Take action; set light source to match sun.
@@ -141,10 +141,7 @@ class Geppetto(SMRTApp):
             brightness = 100
 
         for light in lights:
-            try:
-                self.light_adapter.set_state(light, color=[255, 255, 255], brightness=brightness, kelvin=kelvin, duration=45)
-            except Exception as err:
-                log.warning('failed to set sunling color for %s: %s', light, err)
+            self.light_adapter.set_state(light, color=[255, 255, 255], brightness=brightness, kelvin=kelvin, duration=45)
 
     def action(self, name):
         """Action; run configured action.

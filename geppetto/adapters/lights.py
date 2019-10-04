@@ -66,13 +66,16 @@ class LightAdapter:
         if color is not None:
             body['color'] = color
 
-        response = put(
-            self._url + 'light/' + name + '/state',
-            headers={
-                'Content-Type': 'application/se.novafaen.prism.lightstate.v1+json',
-                'Accept': 'application/se.novafaen.prism.light.v1+json'
-            },
-            body=body
-        )
+        try:
+            response = put(
+                self._url + 'light/' + name + '/state',
+                headers={
+                    'Content-Type': 'application/se.novafaen.prism.lightstate.v1+json',
+                    'Accept': 'application/se.novafaen.prism.light.v1+json'
+                },
+                body=body
+            )
+        except Exception as err:
+            log.warning('failes to set state for %i: %i', name, err)
 
         log.debug('set state, light=%s, state=%s, successful=%s', name, body, response.status_code == 200)
