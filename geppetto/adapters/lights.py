@@ -1,6 +1,7 @@
 """Adapter to abstract REST to functions for lights."""
 
 import logging as loggr
+from uuid import uuid4
 
 from smrt.make_request import put
 
@@ -76,6 +77,7 @@ class LightAdapter:
                 body=body
             )
         except Exception as err:
-            log.warning('failes to set state for %i: %i', name, err)
+            log.warning('failed to set state for %s: %s', name, err)
+            return
 
         log.debug('set state, light=%s, state=%s, successful=%s', name, body, response.status_code == 200)
