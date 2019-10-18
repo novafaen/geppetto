@@ -112,6 +112,12 @@ class Geppetto(SMRTApp):
         """
         log.debug('event sunlight for lights: %s', lights)
 
+        # todo: move to configuration
+        MIN_BRIGHT = 20  # was 50
+        MAX_BRIGHT = 100
+        MIN_KELVIN = 2500
+        MAX_KELVIN = 6500
+
         now_utc = datetime.datetime.now(tz=datetime.timezone.utc)
         midday_utc = datetime.datetime.now(tz=datetime.timezone.utc)\
             .replace(hour=12, minute=0)
@@ -127,10 +133,10 @@ class Geppetto(SMRTApp):
         elif sun_angle > 180:
             sun_angle = 180
 
-        kelvin = 2500 + int(2000 * (sun_angle / sun_angle_max))
+        kelvin = _value_sunangle(MIN_KELVIN, MAX_KELVIN, sun_angle, sun_angle_max)
 
         # brightness range, 50-100, cast to 2 decimals
-        brightness = int(50 + 50 * (sun_angle / sun_angle_max))
+        brightness = _value_sunangle(MIN_BRIGHT, MAX_BRIGHT, sun_angle, sun_angle_max)
 
         log.debug('max=%s, current=%s, brightness=%s', sun_angle_max, sun_angle, brightness)
 
@@ -173,6 +179,11 @@ class Geppetto(SMRTApp):
             light_action_function(light)
         for switch in action['switches']:
             switch_action_function(switch)
+
+
+def _value_sunangle(min, max, sun_current, sun_max):
+    """Calculate based on min, max and spans."""
+    return min + int((max - min) * (sun_current / sun_max))
 
 
 geppetto = Geppetto()
